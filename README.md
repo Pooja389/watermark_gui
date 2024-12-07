@@ -23,5 +23,5 @@ pip install Pillow
 ### Run the application
 save the code in .py file (example watermark.py)
 ```bash
-python main.py
+python watermark.py
 ```
