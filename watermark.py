@@ -1,111 +1,95 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox
-from PIL import Image, ImageTk, ImageDraw, ImageFont
+from tkinter import filedialog,messagebox
+from PIL import ImageFont,ImageDraw,Image,ImageTk
 
-# Initialize the main application window
 root = tk.Tk()
-root.title("Watermark Application")
+root.title("watermark application")
 root.geometry("800x600")
 
-# Global variable for the uploaded image
-uploaded_image = None
+upload_image = None
+def upload():
 
-# Function to upload an image
-def upload_image():
-    global uploaded_image
+    global upload_image
     file_path = filedialog.askopenfilename(
-        filetypes=[("Image Files", "*.jpg;*.jpeg;*.png")]
+        filetypes=[("Image File","*.jpg;*.jpeg;*.png")]
     )
     if file_path:
-        uploaded_image = Image.open(file_path)
-        img_thumbnail = uploaded_image.copy()
-        img_thumbnail.thumbnail((700, 700))  # Resize for display in GUI
-        img_display = ImageTk.PhotoImage(img_thumbnail)
-        img_label.config(image=img_display)
-        img_label.image = img_display
-        messagebox.showinfo("Image Uploaded", "Image successfully uploaded!")
+        upload_image = Image.open(file_path)
+        img_tumbnail = upload_image.copy()
+        img_tumbnail.thumbnail((700,700))
+   
 
-# Function to add watermark text
-def add_watermark_text():
-    global uploaded_image
-    if uploaded_image is None:
-        messagebox.showwarning("Warning", "Please upload an image first.")
-        return
+    if file_path:
+        upload_image = Image.open(file_path)
+        image_thumbnail = upload_image.copy()
+        image_thumbnail.thumbnail((700,700))
+        image_display = ImageTk.PhotoImage(image_thumbnail)
+        image_label.config(image = image_display)
+        image_label.image = image_display
+        messagebox.showinfo("success","Image successfully uploaded")
 
-    watermark_text = watermark_text_entry.get()
-    if not watermark_text:
-        messagebox.showwarning("Warning", "Please enter watermark text.")
-        return
+def add_logo():
+    global upload_image
 
-    # Copy the uploaded image to avoid modifying the original
-    watermarked_image = uploaded_image.copy()
-    draw = ImageDraw.Draw(watermarked_image)
-    font = ImageFont.truetype("arial.ttf", 36)
-    
-    # Calculate the bounding box of the text
-    text_bbox = draw.textbbox((0, 0), watermark_text, font=font)
-    text_width, text_height = text_bbox[2] - text_bbox[0], text_bbox[3] - text_bbox[1]
-
-    # Position watermark at the bottom right
-    x = watermarked_image.width - text_width - 10
-    y = watermarked_image.height - text_height - 10
-    draw.text((x, y), watermark_text, (255, 255, 255), font=font)
-
-    # Save and display the watermarked image
-    watermarked_image.show()
-    save_image(watermarked_image)
-
-
-# Function to add watermark logo
-def add_watermark_logo():
-    global uploaded_image
-    if uploaded_image is None:
-        messagebox.showwarning("Warning", "Please upload an image first.")
-        return
-
-    logo_path = filedialog.askopenfilename(
-        filetypes=[("Image Files", "*.jpg;*.jpeg;*.png")]
-    )
+    logo_path = filedialog.askopenfilename(filetypes=[("Image File","*,jpg;*.jpeg;*png")])
     if logo_path:
         logo = Image.open(logo_path)
-        logo.thumbnail((200, 200))  # Resize logo
+        logo.thumbnail((200,200))
 
-        # Copy the uploaded image to avoid modifying the original
-        watermarked_image = uploaded_image.copy()
+    watermark_image = upload_image.copy()
 
-        # Position logo at the bottom right
-        x = watermarked_image.width - logo.width - 10
-        y = watermarked_image.height - logo.height - 10
-        watermarked_image.paste(logo, (x, y), logo if logo.mode == 'RGBA' else None)
+    x = watermark_image.width - logo.width -10
+    y = watermark_image.height - logo.height -10
 
-        # Save and display the watermarked image
-        watermarked_image.show()
-        save_image(watermarked_image)
+    watermark_image.paste(logo,(x,y),logo if logo.mode == "RGBA"else None) 
+    watermark_image.show()
+    save_image(watermark_image)
+def add_text():
+    global upload_image
+    if upload_image == None:
+        messagebox.showinfo("error","please upload an image first")
+        return
+    
+    watermark_text = text_label.get()
+    if not watermark_text:
+        messagebox.showinfo("Information","please provide a text first")
+        return
+    watermark_img = upload_image.copy()
+    font = ImageFont.truetype("arial.ttf",36)        
+    draw = ImageDraw.Draw(watermark_img)    
 
-# Function to save the watermarked image
+     
+    text_bbox = draw.textbbox((0,0),watermark_text,font = font) 
+    text_height, text_width = text_bbox[3] - text_bbox[1], text_bbox[2] - text_bbox[0]
+
+    x = watermark_img.width - text_width - 10
+    y = watermark_img.height - text_height -10
+    draw.text((x,y),watermark_text,(255,255,255),font = font)
+
+    watermark_img.show()
+    save_image(watermark_img)
+
 def save_image(image):
-    save_path = filedialog.asksaveasfilename(defaultextension=".png",
-                                             filetypes=[("PNG files", "*.png")])
+    save_path = filedialog.asksaveasfilename(filetypes=[("PNG file",".png")])
+
     if save_path:
         image.save(save_path)
-        messagebox.showinfo("Image Saved", f"Image saved to {save_path}")
+        messagebox.showinfo("Success","file saved succesfully")
 
-# Widgets
-upload_btn = tk.Button(root, text="Upload Image", command=upload_image)
+upload_btn = tk.Button(root,text = "upload image",command=upload)
 upload_btn.pack(pady=10)
 
-watermark_text_entry = tk.Entry(root, width=30)
-watermark_text_entry.insert(0, "Enter watermark text")
-watermark_text_entry.pack(pady=10)
+logo_btn = tk.Button(root,text = "add logo",command=add_logo)
+logo_btn.pack(pady=10)
 
-text_watermark_btn = tk.Button(root, text="Add Text Watermark", command=add_watermark_text)
-text_watermark_btn.pack(pady=5)
+text_label = tk.Entry(root)
+text_label.insert(0,"write here")
+text_label.pack(pady=10)
 
-logo_watermark_btn = tk.Button(root, text="Add Logo Watermark", command=add_watermark_logo)
-logo_watermark_btn.pack(pady=5)
+text_button = tk.Button(root,text = "add text",command=add_text)
+text_button.pack(pady=10)
 
-img_label = tk.Label(root)
-img_label.pack(pady=10)
+image_label = tk.Label(root)
+image_label.pack(pady=10)
 
-# Start the application
 root.mainloop()
