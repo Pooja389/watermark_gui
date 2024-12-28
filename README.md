@@ -9,6 +9,10 @@ This is a Python-based graphical application for adding text or logo watermarks 
 - Preview the watermarked image.
 - Save the watermarked image to your system.
 
+## clone the repository
+```bash
+git clone https://github.com/Pooja389/watermark_gui.git
+```
 ## Requirements
 
 Make sure you have the following installed:
